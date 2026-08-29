@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Saidika</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
+        .error { color: #b00020; margin-bottom: 1rem; }
+        label { display: block; margin-top: 1rem; }
+        input, textarea { width: 100%; padding: 0.7rem; box-sizing: border-box; margin-top: 0.4rem; }
+        button { margin-top: 1rem; padding: 0.8rem 1.25rem; }
+    </style>
+</head>
+<body>
+<h1>Saidika</h1>
+<p>Describe the roadside issue and your location.</p>
+
+<div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
+
+<form th:action="@{/assist}" th:object="${assistanceForm}" method="post">
+    <label for="requestText">Roadside request</label>
+    <textarea id="requestText" th:field="*{requestText}" rows="4" required></textarea>
+
+    <label for="latitude">Latitude</label>
+    <input id="latitude" th:field="*{latitude}" type="number" step="any" required/>
+
+    <label for="longitude">Longitude</label>
+    <input id="longitude" th:field="*{longitude}" type="number" step="any" required/>
+
+    <button type="submit">Find help</button>
+</form>
+</body>
+</html>

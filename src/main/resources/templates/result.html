@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Assistance result</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
+        .box { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+        .label { font-weight: bold; }
+    </style>
+</head>
+<body>
+<h1>Recommended provider</h1>
+
+<div class="box">
+    <div><span class="label">Service:</span> <span th:text="${classification.serviceType}"></span></div>
+    <div><span class="label">Provider:</span> <span th:text="${matchResult.provider.name}"></span></div>
+    <div><span class="label">Distance:</span> <span th:text="${#numbers.formatDecimal(matchResult.distanceKm, 1, 2)} + ' km'"></span></div>
+    <div><span class="label">Reason:</span> <span th:text="${classification.reason}"></span></div>
+    <div><span class="label">Rationale:</span> <span th:text="${matchResult.rationale}"></span></div>
+</div>
+
+<a href="/">Back to request</a>
+</body>
+</html>
