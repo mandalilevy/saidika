@@ -1,0 +1,20 @@
+Baseline Evaluation
+-------------------
+Total scenarios: 24
+Strict classification accuracy: 90.5% (19/21 scored)
+Provider matching accuracy: 100.0% (2/2 scored)
+End-to-end resolution accuracy: 90.5% (19/21 strictly scored)
+Passes: 19, Failures: 2, Ambiguous/not-strictly-scored: 3
+
+Category results:
+- Direct requests: 5 pass / 0 fail (of 5)
+- Natural language: 4 pass / 1 fail (of 5)
+- Ambiguous: 1 pass / 0 fail / 3 not scored (of 4)
+- Multi-clue: 3 pass / 1 fail (of 4)
+- Provider matching: 2 pass / 0 fail (of 2)
+- Serviceability: 2 pass / 0 fail (of 2)
+- Unsupported: 2 pass / 0 fail (of 2)
+
+Most important failures:
+1. [N05] My car needs to be transported to a garage. -> Classification mismatch: expected TOWING but got unrecognized.
+2. [M04] I think I might be locked out, but actually my tyre burst is the bigger issue right now. -> Classification mismatch: expected TYRE_ASSISTANCE but got LOCKSMITH.
