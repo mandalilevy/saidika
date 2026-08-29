@@ -6,28 +6,71 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
         .error { color: #b00020; margin-bottom: 1rem; }
+        .info { color: #0b5ea6; margin-bottom: 1rem; }
         label { display: block; margin-top: 1rem; }
         input, textarea { width: 100%; padding: 0.7rem; box-sizing: border-box; margin-top: 0.4rem; }
         button { margin-top: 1rem; padding: 0.8rem 1.25rem; }
+        .location-actions { display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; }
     </style>
 </head>
 <body>
 <h1>Saidika</h1>
-<p>Describe the roadside issue and your location.</p>
+<p>Describe the roadside issue and let Saidika find nearby assistance.</p>
 
 <div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
+<div id="locationStatus" class="info">Location not yet detected.</div>
 
 <form th:action="@{/assist}" th:object="${assistanceForm}" method="post">
     <label for="requestText">Roadside request</label>
     <textarea id="requestText" th:field="*{requestText}" rows="4" required></textarea>
 
-    <label for="latitude">Latitude</label>
-    <input id="latitude" th:field="*{latitude}" type="number" step="any" required/>
+    <input type="hidden" id="latitude" th:field="*{latitude}"/>
+    <input type="hidden" id="longitude" th:field="*{longitude}"/>
 
-    <label for="longitude">Longitude</label>
-    <input id="longitude" th:field="*{longitude}" type="number" step="any" required/>
-
-    <button type="submit">Find help</button>
+    <div class="location-actions">
+        <button type="button" id="useLocationBtn">Use my current location</button>
+        <button type="submit">Find help</button>
+    </div>
 </form>
+
+<script>
+    const useLocationBtn = document.getElementById('useLocationBtn');
+    const locationStatus = document.getElementById('locationStatus');
+    const latitudeInput = document.getElementById('latitude');
+    const longitudeInput = document.getElementById('longitude');
+
+    useLocationBtn.addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            locationStatus.textContent = 'Location is not supported by this browser. Please retry in a modern browser.';
+            return;
+        }
+
+        locationStatus.textContent = 'Requesting your location...';
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                latitudeInput.value = position.coords.latitude;
+                longitudeInput.value = position.coords.longitude;
+                locationStatus.textContent = 'Location detected.';
+            },
+            function (error) {
+                if (error.code === error.PERMISSION_DENIED) {
+                    locationStatus.textContent = 'Location permission denied. Please allow access to use your current location.';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    locationStatus.textContent = 'Location is unavailable right now. Please retry.';
+                } else if (error.code === error.TIMEOUT) {
+                    locationStatus.textContent = 'Location request timed out. Please retry.';
+                } else {
+                    locationStatus.textContent = 'Location could not be obtained. Please retry.';
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    });
+</script>
 </body>
 </html>

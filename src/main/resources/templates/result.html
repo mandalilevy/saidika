@@ -16,6 +16,7 @@
     <div><span class="label">Service:</span> <span th:text="${classification.serviceType}"></span></div>
     <div><span class="label">Provider:</span> <span th:text="${matchResult.provider.name}"></span></div>
     <div><span class="label">Distance:</span> <span th:text="${#numbers.formatDecimal(matchResult.distanceKm, 1, 2)} + ' km'"></span></div>
+    <div><span class="label">Availability:</span> <span th:text="${matchResult.provider.available ? 'Available' : 'Unavailable'}"></span></div>
     <div><span class="label">Reason:</span> <span th:text="${classification.reason}"></span></div>
     <div><span class="label">Rationale:</span> <span th:text="${matchResult.rationale}"></span></div>
 </div>

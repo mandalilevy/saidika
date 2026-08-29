@@ -11,7 +11,7 @@ import com.hackathon.saidika.service.ServiceClassificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -115,12 +115,12 @@ class BaselineFeatureTests {
     @Test
     void providerMatchingFindsNearestAvailableProvider() {
         providerRepository.save(new Provider("Alpha Jump", new Location(51.5000, -0.1000), true, Set.of(ServiceType.JUMP_START)));
-        providerRepository.save(new Provider("Bravo Jump", new Location(51.5200, -0.1200), true, Set.of(ServiceType.JUMP_START)));
+        providerRepository.save(new Provider("Bravo Jump", new Location(52.0000, -0.5000), true, Set.of(ServiceType.JUMP_START)));
         providerRepository.save(new Provider("Closed Jump", new Location(51.4800, -0.0900), false, Set.of(ServiceType.JUMP_START)));
 
         Optional<com.hackathon.saidika.domain.MatchResult> result = providerMatchingService.findBestProvider(
                 ServiceType.JUMP_START,
-                new Location(51.5100, -0.1100)
+                new Location(51.5000, -0.1000)
         );
 
         assertThat(result).isPresent();
@@ -155,6 +155,41 @@ class BaselineFeatureTests {
     }
 
     @Test
+    void providerWithinServiceRadiusIsEligible() {
+        providerRepository.save(new Provider("Nairobi Jump", new Location(-1.2864, 36.8172), true, Set.of(ServiceType.JUMP_START), 15.0));
+        providerRepository.save(new Provider("Far Jump", new Location(-1.0000, 36.0000), true, Set.of(ServiceType.JUMP_START), 2.0));
+
+        Optional<com.hackathon.saidika.domain.MatchResult> result = providerMatchingService.findBestProvider(
+                ServiceType.JUMP_START,
+                new Location(-1.2860, 36.8180)
+        );
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getProvider().getName()).isEqualTo("Nairobi Jump");
+    }
+
+    @Test
+    void providerOutsideServiceRadiusIsExcluded() {
+        providerRepository.save(new Provider("Far Towing", new Location(-1.0000, 36.0000), true, Set.of(ServiceType.TOWING), 2.0));
+
+        Optional<com.hackathon.saidika.domain.MatchResult> result = providerMatchingService.findBestProvider(
+                ServiceType.TOWING,
+                new Location(-1.2860, 36.8180)
+        );
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void seededProvidersUseNairobiCoordinates() {
+        providerRepository.save(new Provider("Nairobi Rescue", new Location(-1.2864, 36.8172), true, Set.of(ServiceType.TOWING), 20.0));
+        Provider provider = providerRepository.findAll().get(0);
+
+        assertThat(provider.getLocation().getLatitude()).isBetween(-2.0, 0.0);
+        assertThat(provider.getLocation().getLongitude()).isBetween(36.0, 38.0);
+    }
+
+    @Test
     void getRootPageLoadsForm() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -163,11 +198,13 @@ class BaselineFeatureTests {
 
     @Test
     void validAssistRequestReturnsResult() throws Exception {
+        providerRepository.save(new Provider("Test Nairobi Jump", new Location(-1.2864, 36.8172), true, Set.of(ServiceType.JUMP_START), 12.0));
+
         mockMvc.perform(post("/assist")
                         .contentType("application/x-www-form-urlencoded")
                         .param("requestText", "My battery is dead and my car won't start")
-                        .param("latitude", "51.5")
-                        .param("longitude", "-0.1"))
+                        .param("latitude", "-1.2864")
+                        .param("longitude", "36.8172"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("result"))
                 .andExpect(model().attributeExists("classification"))

@@ -22,17 +22,20 @@ public class ProviderDataSeeder {
             }
 
             List<Provider> providers = List.of(
-                    new Provider("Metro Jump", new Location(51.5034, -0.1196), true, Set.of(ServiceType.JUMP_START, ServiceType.TOWING)),
-                    new Provider("North Battery", new Location(51.5200, -0.1400), true, Set.of(ServiceType.JUMP_START)),
-                    new Provider("Harbor Tyres", new Location(51.4900, -0.1000), true, Set.of(ServiceType.TYRE_ASSISTANCE)),
-                    new Provider("South Tyre Response", new Location(51.4700, -0.0700), true, Set.of(ServiceType.TYRE_ASSISTANCE, ServiceType.FUEL_ASSISTANCE)),
-                    new Provider("City Mechanics", new Location(51.5300, -0.1500), true, Set.of(ServiceType.MOBILE_MECHANIC, ServiceType.TOWING)),
-                    new Provider("Highway Recovery", new Location(51.5500, -0.1800), true, Set.of(ServiceType.TOWING, ServiceType.FUEL_ASSISTANCE)),
-                    new Provider("Quick Fuel", new Location(51.4950, -0.1300), true, Set.of(ServiceType.FUEL_ASSISTANCE)),
-                    new Provider("Lock & Go", new Location(51.5100, -0.0900), true, Set.of(ServiceType.LOCKSMITH)),
-                    new Provider("West Lockout", new Location(51.4500, -0.1600), true, Set.of(ServiceType.LOCKSMITH, ServiceType.JUMP_START)),
-                    new Provider("Rural Rescue", new Location(52.0000, -0.1000), true, Set.of(ServiceType.TOWING, ServiceType.MOBILE_MECHANIC)),
-                    new Provider("Closed Service", new Location(51.5000, -0.1000), false, Set.of(ServiceType.JUMP_START, ServiceType.TYRE_ASSISTANCE, ServiceType.LOCKSMITH))
+                    new Provider("Nairobi Jump Centre", new Location(-1.2864, 36.8172), true, Set.of(ServiceType.JUMP_START, ServiceType.TOWING), 12.0),
+                    new Provider("Westlands Battery Care", new Location(-1.2576, 36.8037), true, Set.of(ServiceType.JUMP_START), 10.0),
+                    new Provider("Karen Tyre Fix", new Location(-1.3180, 36.7069), true, Set.of(ServiceType.TYRE_ASSISTANCE), 9.0),
+                    new Provider("Eastleigh Tyre Response", new Location(-1.2681, 36.8794), true, Set.of(ServiceType.TYRE_ASSISTANCE, ServiceType.FUEL_ASSISTANCE), 15.0),
+                    new Provider("Kilimani Mechanics", new Location(-1.2807, 36.7893), true, Set.of(ServiceType.MOBILE_MECHANIC, ServiceType.TOWING), 14.0),
+                    new Provider("Embakasi Recovery", new Location(-1.3279, 36.8970), true, Set.of(ServiceType.TOWING, ServiceType.FUEL_ASSISTANCE), 18.0),
+                    new Provider("Airport Fuel Point", new Location(-1.3196, 36.9260), true, Set.of(ServiceType.FUEL_ASSISTANCE), 16.0),
+                    new Provider("CBD Lock & Go", new Location(-1.2833, 36.8167), true, Set.of(ServiceType.LOCKSMITH), 8.0),
+                    new Provider("Ngong Lockout Team", new Location(-1.3612, 36.6465), true, Set.of(ServiceType.LOCKSMITH, ServiceType.JUMP_START), 20.0),
+                    new Provider("Ruai Road Rescue", new Location(-1.2200, 37.0143), true, Set.of(ServiceType.TOWING, ServiceType.MOBILE_MECHANIC), 22.0),
+                    new Provider("Kiserian Assist", new Location(-1.4243, 36.6778), true, Set.of(ServiceType.MOBILE_MECHANIC, ServiceType.FUEL_ASSISTANCE), 25.0),
+                    new Provider("Kibera Road Care", new Location(-1.3068, 36.7895), true, Set.of(ServiceType.JUMP_START, ServiceType.TYRE_ASSISTANCE), 11.0),
+                    new Provider("Closed Nairobi Tyre", new Location(-1.3900, 36.7200), false, Set.of(ServiceType.TYRE_ASSISTANCE), 6.0),
+                    new Provider("Out-of-area Recovery", new Location(-0.9000, 34.6000), true, Set.of(ServiceType.TOWING, ServiceType.JUMP_START), 5.0)
             );
 
             providerRepository.saveAll(providers);

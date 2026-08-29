@@ -45,7 +45,7 @@ public class ServiceClassificationService {
 
         matches.sort(Comparator
                 .comparingInt(RuleMatch::index)
-                .thenComparingInt(RuleMatch::specificity).reversed()
+                .thenComparing(Comparator.comparingInt(RuleMatch::specificity).reversed())
                 .thenComparing(rule -> rule.serviceType().name()));
 
         RuleMatch selected = matches.get(0);
