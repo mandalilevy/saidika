@@ -2,42 +2,167 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Saidika</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
-        .error { color: #b00020; margin-bottom: 1rem; }
-        .info { color: #0b5ea6; margin-bottom: 1rem; }
-        label { display: block; margin-top: 1rem; }
-        input, textarea { width: 100%; padding: 0.7rem; box-sizing: border-box; margin-top: 0.4rem; }
-        button { margin-top: 1rem; padding: 0.8rem 1.25rem; }
-        .location-actions { display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; }
+        :root {
+            --color-bg: #f4f6f8;
+            --color-surface: #ffffff;
+            --color-primary: #0b5ea6;
+            --color-primary-dark: #084a85;
+            --color-text: #1c2733;
+            --color-muted: #5b6b7a;
+            --color-error: #b00020;
+            --color-border: #d9e1e8;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 1.5rem;
+            background: var(--color-bg);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+        }
+        main {
+            width: 100%;
+            max-width: 640px;
+        }
+        h1 { margin-bottom: 0.25rem; }
+        .subtitle { color: var(--color-muted); margin-top: 0; }
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-top: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .error { color: var(--color-error); font-weight: 600; margin-bottom: 1rem; }
+        .info { color: var(--color-primary); margin: 0; }
+        label { display: block; margin-top: 1rem; font-weight: 600; }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-top: 0.4rem;
+            font-family: inherit;
+        }
+        textarea:focus, input:focus, button:focus {
+            outline: 3px solid #9cc4e4;
+            outline-offset: 1px;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            margin-top: 1.25rem;
+        }
+        button {
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button.primary {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: #fff;
+        }
+        button.primary:hover { background: var(--color-primary-dark); }
+        button.secondary {
+            background: #eef4fa;
+            border-color: var(--color-primary);
+            color: var(--color-primary-dark);
+        }
+        .hint { color: var(--color-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+        .progress-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 25, 35, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 10;
+        }
+        /* author "display: flex" above otherwise beats the browser's default [hidden]{display:none} rule */
+        .progress-overlay[hidden] { display: none; }
+        .progress-card {
+            background: var(--color-surface);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 360px;
+            text-align: center;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 480px) {
+            body { padding: 1rem; }
+            .actions { flex-direction: column; align-items: stretch; }
+            button { width: 100%; }
+        }
     </style>
 </head>
 <body>
-<h1>Saidika</h1>
-<p>Describe the roadside issue and let Saidika find nearby assistance.</p>
+<main>
+    <h1>Saidika</h1>
+    <p class="subtitle">Describe the roadside issue and let Saidika find nearby assistance.</p>
 
-<div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
-<div id="locationStatus" class="info">Location not yet detected.</div>
+    <div th:if="${errorMessage}" class="error" role="alert" th:text="${errorMessage}"></div>
 
-<form th:action="@{/assist}" th:object="${assistanceForm}" method="post">
-    <label for="requestText">Roadside request</label>
-    <textarea id="requestText" th:field="*{requestText}" rows="4" required></textarea>
+    <div class="card">
+        <p id="locationStatus" class="info" role="status">Location not yet detected.</p>
 
-    <input type="hidden" id="latitude" th:field="*{latitude}"/>
-    <input type="hidden" id="longitude" th:field="*{longitude}"/>
+        <form th:action="@{/agent/assist}" th:object="${assistanceForm}" method="post">
+            <label for="requestText">Roadside request</label>
+            <textarea id="requestText" th:field="*{requestText}" rows="4" required
+                      placeholder="e.g. My car stopped and I need it towed to a garage."></textarea>
 
-    <div class="location-actions">
-        <button type="button" id="useLocationBtn">Use my current location</button>
-        <button type="submit">Find help</button>
+            <input type="hidden" id="latitude" th:field="*{latitude}"/>
+            <input type="hidden" id="longitude" th:field="*{longitude}"/>
+
+            <div class="actions">
+                <button type="button" id="useLocationBtn">📍 Use my current location</button>
+                <button type="submit" id="agentSubmitBtn" class="primary">
+                    Ask Saidika Agent
+                </button>
+            </div>
+        </form>
     </div>
-</form>
+</main>
+
+<div id="progressOverlay" class="progress-overlay" hidden>
+    <div class="progress-card">
+        <div class="spinner" aria-hidden="true"></div>
+        <p><strong>Finding help for you…</strong></p>
+        <p class="hint">Understanding your request, checking nearby providers, and looking up public
+            provider information.</p>
+    </div>
+</div>
 
 <script>
     const useLocationBtn = document.getElementById('useLocationBtn');
     const locationStatus = document.getElementById('locationStatus');
     const latitudeInput = document.getElementById('latitude');
     const longitudeInput = document.getElementById('longitude');
+    const agentBtn = document.getElementById('agentSubmitBtn');
+    const overlay = document.getElementById('progressOverlay');
 
     useLocationBtn.addEventListener('click', function () {
         if (!navigator.geolocation) {
@@ -71,6 +196,15 @@
             }
         );
     });
+
+    // Real network/processing latency drives this, not a fixed timer: the overlay simply covers the
+    // synchronous form submission so the page never looks blank/frozen while the agent is working.
+    if (agentBtn) {
+        agentBtn.addEventListener('click', function () {
+            overlay.hidden = false;
+        });
+    }
 </script>
 </body>
 </html>
+

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Saidika Agent result</title>
+    <style>
+        :root {
+            --color-bg: #f4f6f8;
+            --color-surface: #ffffff;
+            --color-primary: #0b5ea6;
+            --color-text: #1c2733;
+            --color-muted: #5b6b7a;
+            --color-error: #b00020;
+            --color-border: #d9e1e8;
+            --color-verified: #1a7a3d;
+            --color-found: #8a6d00;
+            --color-unavailable: #8a8f96;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 1.5rem;
+            background: var(--color-bg);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+        }
+        main { width: 100%; max-width: 640px; }
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-top: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .error { color: var(--color-error); font-weight: 600; }
+        .label { font-weight: 600; color: var(--color-muted); font-size: 0.85rem; text-transform: uppercase; }
+        .value { margin: 0.15rem 0 0.9rem; }
+        .value:last-child { margin-bottom: 0; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .badge.verified { background: var(--color-verified); }
+        .badge.found { background: var(--color-found); }
+        .badge.unavailable { background: var(--color-unavailable); }
+        .badge.fallback { background: #a15c00; }
+        .alt-list { list-style: none; padding: 0; margin: 0; }
+        .alt-list li { padding: 0.5rem 0; border-top: 1px solid var(--color-border); }
+        .alt-list li:first-child { border-top: none; }
+        a.back { display: inline-block; margin-top: 1rem; color: var(--color-primary); }
+        @media (max-width: 480px) {
+            body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Saidika Agent</h1>
+
+    <div th:if="${agentResult.errorMessage != null}" class="card">
+        <p class="error" th:text="${agentResult.errorMessage}"></p>
+    </div>
+
+    <div th:if="${agentResult.recognized}" class="card">
+        <p class="label">Understood service</p>
+        <p class="value" th:text="${agentResult.serviceType}"></p>
+        <p class="label">Explanation</p>
+        <p class="value" th:text="${agentResult.explanation}"></p>
+        <span th:if="${agentResult.usedFallbackClassifier}" class="badge fallback">Deterministic fallback used</span>
+    </div>
+
+    <div th:if="${agentResult.providerFound}" class="card">
+        <h2>Recommended provider</h2>
+        <p class="label">Name</p>
+        <p class="value" th:text="${agentResult.primaryProvider.name}"></p>
+        <p class="label">Distance</p>
+        <p class="value" th:text="${#numbers.formatDecimal(agentResult.primaryProvider.distanceKm, 1, 2)} + ' km'"></p>
+        <p class="label">Availability</p>
+        <p class="value" th:text="${agentResult.primaryProvider.available ? 'Available' : 'Unavailable'}"></p>
+
+        <p class="label">Address</p>
+        <p class="value" th:text="${agentResult.primaryProvider.address != null ? agentResult.primaryProvider.address : 'Unavailable'}"></p>
+        <p class="label">Phone</p>
+        <p class="value" th:text="${agentResult.primaryProvider.phone != null ? agentResult.primaryProvider.phone : 'Unavailable'}"></p>
+        <p class="label">Website</p>
+        <p class="value" th:text="${agentResult.primaryProvider.website != null ? agentResult.primaryProvider.website : 'Unavailable'}"></p>
+
+        <p class="label">Verification</p>
+        <p class="value">
+            <span th:if="${agentResult.primaryProvider.verificationStatus.name() == 'VERIFIED'}" class="badge verified">VERIFIED</span>
+            <span th:if="${agentResult.primaryProvider.verificationStatus.name() == 'PUBLIC_INFORMATION_FOUND'}" class="badge found">PUBLIC INFORMATION FOUND</span>
+            <span th:if="${agentResult.primaryProvider.verificationStatus.name() == 'INFORMATION_UNAVAILABLE'}" class="badge unavailable">INFORMATION UNAVAILABLE</span>
+        </p>
+        <p class="value" th:text="${agentResult.primaryProvider.verificationNotes}"></p>
+        <p th:if="${agentResult.primaryProvider.sourceUrl != null}" class="value">
+            Source: <a th:href="${agentResult.primaryProvider.sourceUrl}" th:text="${agentResult.primaryProvider.sourceUrl}" target="_blank" rel="noopener noreferrer"></a>
+        </p>
+
+        <div th:if="${!agentResult.alternateProviders.isEmpty()}">
+            <p class="label">Also nearby (not researched)</p>
+            <ul class="alt-list">
+                <li th:each="alt : ${agentResult.alternateProviders}">
+                    <span th:text="${alt.name}"></span> —
+                    <span th:text="${#numbers.formatDecimal(alt.distanceKm, 1, 2)} + ' km'"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <a class="back" href="/">Back to request</a>
+</main>
+</body>
+</html>
